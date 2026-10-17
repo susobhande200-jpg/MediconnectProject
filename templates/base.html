@@ -17,6 +17,7 @@
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
   <div class="collapse navbar-collapse" id="mainNav">
    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+    <li class="nav-item"><button class="theme-toggle" type="button" id="themeToggle" aria-label="Switch to dark mode" title="Switch theme"><i class="bi bi-moon-stars-fill" id="themeIcon"></i><span class="theme-toggle-label">Dark mode</span></button></li>
     <li class="nav-item"><a class="nav-link" href="{% url 'doctors' %}">Find Doctors</a></li>
     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#departments">Departments</a></li>
     {% if user.is_authenticated %}
@@ -35,5 +36,15 @@
 <main>{% if messages %}<div class="container pt-3">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">{{ message }}<button class="btn-close" data-bs-dismiss="alert"></button></div>{% endfor %}</div>{% endif %}{% block content %}{% endblock %}</main>
 <footer class="footer"><div class="container footer-inner"><a class="brand text-white" href="{% url 'home' %}"><span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>Medi<span>Connect</span></a><span>Care that fits your life. <span class="muted">© {% now "Y" %} MediConnect College Project</span></span></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>document.querySelectorAll('[data-confirm]').forEach(el=>el.addEventListener('click',e=>{if(!confirm(el.dataset.confirm))e.preventDefault()}));</script>
+<script>
+(()=>{
+ const root=document.documentElement, toggle=document.getElementById('themeToggle'), icon=document.getElementById('themeIcon');
+ const stored=(()=>{try{return localStorage.getItem('mediconnect-theme')}catch(e){return null}})();
+ const preferred=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+ function applyTheme(theme){root.setAttribute('data-theme',theme);root.style.colorScheme=theme;if(icon)icon.className=theme==='dark'?'bi bi-sun-fill':'bi bi-moon-stars-fill';if(toggle){toggle.setAttribute('aria-label',theme==='dark'?'Switch to light mode':'Switch to dark mode');toggle.title=theme==='dark'?'Switch to light mode':'Switch to dark mode';const label=toggle.querySelector('.theme-toggle-label');if(label)label.textContent=theme==='dark'?'Light mode':'Dark mode';}}
+ applyTheme(stored==='dark'||stored==='light'?stored:preferred);
+ if(toggle)toggle.addEventListener('click',()=>{const next=root.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(next);try{localStorage.setItem('mediconnect-theme',next)}catch(e){}});
+ document.querySelectorAll('[data-confirm]').forEach(el=>el.addEventListener('click',e=>{if(!confirm(el.dataset.confirm))e.preventDefault()}));
+})();
+</script>
 </body></html>
